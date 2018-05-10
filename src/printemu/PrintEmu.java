@@ -73,6 +73,40 @@ public class PrintEmu {
         }
     }
     
+    public static int AveragePrinted(ArrayList<DOC> arrDoc)
+    {
+        //среднее время напечатанных
+        int avgTime=0;
+        int count=0;
+        for (DOC doc:arrDoc)
+        {
+            if (doc.state == 3)
+            {
+                avgTime += doc.time;
+                count++;
+            }
+        }
+        return (avgTime/count);
+    }
+    
+    
+    
+   
+    public static ArrayList<DOC> AlreadyPrinted(ArrayList<DOC> arrDoc, String type)
+    {
+        //вывод напечатанных с сортировкой
+        ArrayList<DOC> goodList = null;
+        for (DOC doc:arrDoc)
+        {
+            if (doc.state == 3)
+            {
+                goodList.add(doc);
+            }
+        }
+        //тут должна быть сортировка
+        //по типу, указываемому в конструкторе функции как type
+        return goodList;
+    }
     
     public static ArrayList<DOC> Stop(ArrayList<DOC> arrDoc, Boolean runState)        //остановка печати
     {
@@ -106,6 +140,8 @@ public class PrintEmu {
         void Stopped();
         void Added();
         void Canceled();
+        void Average();
+        void Printed();
 
     }
     
@@ -139,8 +175,6 @@ public class PrintEmu {
             @Override
             public void Stopped()
             {
-                
-                
                 arr = Stop(arr,runs);
                 PrintLose(arr);
             }
@@ -154,6 +188,16 @@ public class PrintEmu {
             {
                 CancelDoc(arr, name);
             }
+            @Override
+            public void Average()
+            {
+                AveragePrinted(arr);
+            }
+            @Override
+            public void Printed()
+            {
+                AlreadyPrinted(arr,"name");//при сортировке по имени
+            }
         }
     public static void main(String[] args) 
     {
@@ -161,8 +205,6 @@ public class PrintEmu {
         Boolean runs=false;
         
         COM command = new COM(docs, runs);
-        
-
     }
     
 }
