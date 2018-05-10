@@ -8,11 +8,11 @@ public class PrintEmu {
      * @param args the command line arguments
      */
     
-    Boolean runs;
+    //Boolean runs;
     
-    ArrayList<DOC> docs;
+    //ArrayList<DOC> docs;
     
-    public class SecondThread extends Thread
+    public static class SecondThread extends Thread
     {
         SecondThread(ArrayList<DOC> arrDoc, String name, int size, int time)
         {
@@ -22,30 +22,31 @@ public class PrintEmu {
 
     }
     
-    public void IncomeDoc(ArrayList<DOC> arrDoc, String name, int size, int time)
+    public static void IncomeDoc(ArrayList<DOC> arrDoc, String name, int size, int time)
     {
         //добавление в очередь печати, в отдельном потоке
         SecondThread sec = new SecondThread(arrDoc,name,size,time);
     }
     
-    public void CancelDoc(ArrayList<DOC> arrDoc, String name)
+    public static void CancelDoc(ArrayList<DOC> arrDoc, String name)
     {
         //удаление из очереди печати по id
         arrDoc.remove(arrDoc.indexOf(name));
     }
     
-    public void PrintDoc(DOC doc)
+    public static void PrintDoc(DOC doc)
     {
         //функция заглушка: обращение к принтеру и вывод на печать
     }
     
-    public void PrintLose(ArrayList<DOC> arrDoc)
+    public static void PrintLose(ArrayList<DOC> arrDoc)
     {
-        ////функция заглушка: обращение к принтеру и вывод на печать
+        //функция заглушка: обращение к принтеру и вывод на печать
     }
     
-    public void Printing(ArrayList<DOC> arrDoc, Boolean runState)
+    public static void Printing(ArrayList<DOC> arrDoc, Boolean runState)
     {
+        //печать
         if (runState == false)
         {
         for (DOC doc:arrDoc)
@@ -75,6 +76,7 @@ public class PrintEmu {
     
     public static ArrayList<DOC> Stop(ArrayList<DOC> arrDoc, Boolean runState)        //остановка печати
     {
+        //остановка печати
         if (runState == true)
         {
         ArrayList<DOC> lose = new ArrayList<DOC>();
@@ -99,34 +101,68 @@ public class PrintEmu {
     
     public interface event extends EventListener
     {
-        //заглушка событий
-        //зависит от необходимого метода управления
-    }
+        //интерфейс слушателей
+        void Started();
+        void Stopped();
+        void Added();
+        void Canceled();
 
+    }
+    
+    class REACT 
+    {
+        //слушатель
+        private List<event> listener = new ArrayList<event>();
+        public void addListener(event toAdd)
+        {
+            listener.add(toAdd);
+        }
+
+}
+    static class COM implements event
+        {
+        //обработчик событий
+        public ArrayList<DOC> arr = null;
+        public Boolean runs=false;
+        public String name;
+        public int size, time;
+        public COM (ArrayList<DOC> arrDoc, Boolean run)
+        {
+            this.runs = run;
+            this.arr = arrDoc;
+        }
+            @Override
+            public void Started()
+            {
+                Printing(arr,runs);
+            }
+            @Override
+            public void Stopped()
+            {
+                
+                
+                arr = Stop(arr,runs);
+                PrintLose(arr);
+            }
+            @Override
+            public void Added()
+            {
+                IncomeDoc(arr,name,size,time);
+            }
+            @Override
+            public void Canceled()
+            {
+                CancelDoc(arr, name);
+            }
+        }
     public static void main(String[] args) 
     {
+        ArrayList<DOC> docs = null;
+        Boolean runs=false;
+        
+        COM command = new COM(docs, runs);
         
 
-        
-        //event: press "Start" button
-            //Printing(docs);
-        
-        //event: press "Stop" button        
-            //docs = Stop(docs);
-            //PrintLose(docs);
-        
-        //event: press "Add document" button
-            //IncomeDoc(docs,name,size,time);
-            //name, size, time - уникальны для каждого документа
-        
-        //event: press "Cancel document" button
-            //CancelDoc(docs, name);
-            //name - имя документа который необходимо удалить
-            //вводится при удалении
-        
-        //event выбирается в зависимости от типа управления
-        //KeyEvent - при управлении с физического интерфейса (клавиатура)
-        //TextEvent - при управлении командой (порт)
     }
     
 }
